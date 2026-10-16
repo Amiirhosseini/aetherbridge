@@ -1,0 +1,38 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1.0",
+	"FriendlyName": "AetherBridge",
+	"Description": "Python bridge for AI agents controlling Unreal via Remote Control + editor scripting.",
+	"Category": "AI",
+	"CreatedBy": "AetherBridge",
+	"CreatedByURL": "https://github.com/Amiirhosseini/aetherbridge",
+	"DocsURL": "https://github.com/Amiirhosseini/aetherbridge",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "AetherBridge",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "PythonScriptPlugin",
+			"Enabled": true
+		},
+		{
+			"Name": "RemoteControl",
+			"Enabled": true
+		},
+		{
+			"Name": "RemoteControlWebInterface",
+			"Enabled": true
+		}
+	]
+}

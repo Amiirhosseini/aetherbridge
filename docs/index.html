@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AetherBridge — AI agents for Unreal Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #e8eef4;
+      --muted: #8a9aab;
+      --void: #0b1218;
+      --panel: rgba(16, 28, 38, 0.82);
+      --line: rgba(120, 160, 180, 0.22);
+      --ember: #e85d04;
+      --cyan: #2ec4b6;
+      --steel: #4a6fa5;
+      --shadow: 0 24px 60px rgba(0,0,0,.45);
+    }
+    * { box-sizing: border-box }
+    body {
+      margin: 0; color: var(--ink); min-height: 100vh;
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      background:
+        radial-gradient(900px 480px at 10% -10%, rgba(46,196,182,.18), transparent 55%),
+        radial-gradient(700px 400px at 95% 5%, rgba(232,93,4,.14), transparent 50%),
+        linear-gradient(165deg, #0a1016 0%, #121c28 45%, #0d151c 100%);
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .35;
+      background-image:
+        linear-gradient(rgba(232,93,4,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(46,196,182,.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: linear-gradient(#000, transparent 85%);
+    }
+    .wrap { width: min(1140px, calc(100% - 2rem)); margin: 0 auto; position: relative }
+    .hero { padding: 3.4rem 0 1.2rem; animation: rise .65s ease both }
+    .brand {
+      font-family: Syne, sans-serif; font-weight: 800;
+      font-size: clamp(2.5rem, 7vw, 4rem); margin: 0 0 .45rem;
+      letter-spacing: -.03em; line-height: .95;
+    }
+    .brand span { color: var(--ember) }
+    .lede { max-width: 36rem; color: var(--muted); font-size: 1.05rem; margin: 0 0 1.1rem; line-height: 1.45 }
+    .row { display: flex; flex-wrap: wrap; gap: .5rem }
+    .btn {
+      border: 1px solid var(--ember); background: var(--ember); color: #120a04;
+      border-radius: 10px; padding: .62rem 1.05rem; font: inherit; font-weight: 700; cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(232,93,4,.35) }
+    .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line) }
+    .status {
+      margin-top: .95rem; padding: .7rem 1rem; border-radius: 10px;
+      background: rgba(46,196,182,.08); border: 1px solid rgba(46,196,182,.28);
+      font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: #b8eae4;
+    }
+    .grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 1rem; padding-bottom: 2.4rem }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr } }
+    .panel {
+      background: var(--panel); backdrop-filter: blur(10px);
+      border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow);
+      padding: 1.05rem; animation: rise .8s ease both;
+    }
+    h2 { font-family: Syne, sans-serif; font-size: 1.2rem; margin: 0 0 .4rem; font-weight: 700 }
+    .hint { color: var(--muted); font-size: .86rem; margin: 0 0 .65rem }
+    .scen { display: grid; grid-template-columns: repeat(3, 1fr); gap: .45rem; margin-bottom: .75rem }
+    @media (max-width: 700px) { .scen { grid-template-columns: 1fr } }
+    .sc {
+      border: 1px solid var(--line); background: rgba(8,14,20,.6); border-radius: 12px;
+      padding: .65rem; cursor: pointer; text-align: left; font: inherit; color: var(--ink);
+      transition: border-color .15s ease;
+    }
+    .sc.on { border-color: var(--cyan); box-shadow: 0 0 0 1px rgba(46,196,182,.35) }
+    .sc strong { display: block; margin-bottom: .15rem; font-family: Syne, sans-serif }
+    .meters { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; margin: .55rem 0 }
+    @media (max-width: 700px) { .meters { grid-template-columns: repeat(2, 1fr) } }
+    .meter {
+      background: rgba(8,14,20,.7); border: 1px solid var(--line);
+      border-radius: 10px; padding: .5rem; text-align: center;
+    }
+    .meter .k { font-size: .68rem; color: var(--muted) }
+    .meter .v { font-family: Syne, sans-serif; font-size: 1.1rem; color: var(--cyan) }
+    .goal {
+      width: 100%; margin: .4rem 0 .7rem; padding: .65rem .75rem; border-radius: 10px;
+      border: 1px solid var(--line); background: rgba(8,14,20,.75); color: var(--ink);
+      font: inherit; resize: vertical; min-height: 3.2rem;
+    }
+    .actors {
+      display: grid; gap: .3rem; max-height: 220px; overflow: auto;
+      font-family: "IBM Plex Mono", monospace; font-size: .74rem;
+    }
+    .actor {
+      display: grid; grid-template-columns: 1fr auto; gap: .4rem;
+      padding: .35rem .5rem; border-radius: 8px; background: rgba(8,14,20,.65);
+      border-left: 3px solid var(--steel);
+    }
+    .actor.npc { border-color: var(--ember) }
+    .actor.prop { border-color: var(--cyan) }
+    .trace { display: grid; gap: .35rem; max-height: 520px; overflow: auto }
+    .ev {
+      border-left: 3px solid var(--cyan); background: rgba(8,14,20,.7);
+      border-radius: 0 10px 10px 0; padding: .45rem .6rem; font-size: .84rem;
+      animation: slide .22s ease both;
+    }
+    .ev.tool_call { border-color: var(--ember) }
+    .ev.assistant { border-color: var(--steel); font-weight: 600 }
+    .meta { font-family: "IBM Plex Mono", monospace; font-size: .68rem; color: var(--muted) }
+    footer { padding: 1rem 0 2.2rem; color: var(--muted); font-size: .85rem; border-top: 1px solid var(--line) }
+    footer a { color: var(--cyan) }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+    @keyframes slide { from { opacity: 0; transform: translateX(-6px) } to { opacity: 1; transform: none } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1 class="brand">Aether<span>Bridge</span></h1>
+      <p class="lede">
+        LangChain agents that operate <strong>Unreal Engine</strong> —
+        level inspect, spawn/move actors, NPC behaviors, weather, and Remote Control (:30010),
+        with a deterministic sim when the editor is offline.
+      </p>
+      <div class="row">
+        <button class="btn" id="run" type="button">Run UE agent</button>
+        <button class="btn ghost" id="diagnose" type="button">Diagnose level</button>
+        <button class="btn ghost" id="refresh" type="button">Refresh snapshot</button>
+        <a class="btn ghost" href="https://github.com/Amiirhosseini/aetherbridge" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+      <div class="status" id="status">Pick a scenario — agent uses the built-in Unreal sim (same tools as live Remote Control).</div>
+    </header>
+
+    <section class="grid">
+      <div class="panel">
+        <h2>Unreal world</h2>
+        <p class="hint">Scenarios mirror UE maps. Live editor: enable Remote Control + AetherBridge plugin.</p>
+        <div class="scen" id="scen"></div>
+        <div class="meters">
+          <div class="meter"><div class="k">Backend</div><div class="v" id="m-backend">sim</div></div>
+          <div class="meter"><div class="k">Actors</div><div class="v" id="m-actors">0</div></div>
+          <div class="meter"><div class="k">NPCs</div><div class="v" id="m-npcs">0</div></div>
+          <div class="meter"><div class="k">Weather</div><div class="v" id="m-weather">—</div></div>
+        </div>
+        <label class="hint" for="goal">Agent goal</label>
+        <textarea class="goal" id="goal">Diagnose the level, spread NPCs, and set hostile units to attack.</textarea>
+        <div class="hint">Actors</div>
+        <div class="actors" id="actors"></div>
+      </div>
+      <div class="panel">
+        <h2>Agent trace</h2>
+        <p class="hint">diagnose → list_actors → remediate → inspect_level</p>
+        <div class="trace" id="trace"></div>
+      </div>
+    </section>
+
+    <footer>
+      AetherBridge · Unreal Engine AI agents ·
+      <a href="https://github.com/Amiirhosseini/aetherbridge">source</a> ·
+      <a href="https://amiirhosseini.com/aetherbridge/">demo</a>
+    </footer>
+  </div>
+
+  <script>
+    const SCENARIOS = {
+      plaza: { title: "Agent Plaza", map: "/Game/Maps/AgentPlaza", blurb: "Clear day, patrol NPCs" },
+      "combat-arena": { title: "Combat Arena", map: "/Game/Maps/CombatArena", blurb: "Hostile mix, overcast" },
+      "night-city": { title: "Night Block", map: "/Game/Maps/NightBlock", blurb: "Rain + night lighting" },
+    };
+
+    // Embedded deterministic sim (mirrors Python UnrealSimWorld) for static Pages.
+    const SEEDS = {
+      plaza: { map: "/Game/Maps/AgentPlaza", weather: "clear", time: 12, seed: 11, npcs: 3, props: 6, hostile: false },
+      "combat-arena": { map: "/Game/Maps/CombatArena", weather: "overcast", time: 12, seed: 22, npcs: 5, props: 4, hostile: true },
+      "night-city": { map: "/Game/Maps/NightBlock", weather: "rain", time: 22.5, seed: 33, npcs: 4, props: 8, hostile: false },
+    };
+
+    function mulberry32(a) {
+      return function () {
+        let t = (a += 0x6d2b79f5);
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function buildWorld(id) {
+      const cfg = SEEDS[id];
+      const rnd = mulberry32(cfg.seed);
+      let seq = 0;
+      const idn = (p) => `${p}_${String(++seq).padStart(3, "0")}`;
+      const actors = [
+        { id: idn("PS"), name: "PlayerStart", kind: "player_start", location: { x: 0, y: 0, z: 92 }, tags: ["spawn"], behavior: "idle" },
+        { id: idn("L"), name: "SunLight", kind: "light", location: { x: 0, y: 0, z: 500 }, tags: ["lighting"], behavior: "idle" },
+      ];
+      for (let i = 0; i < cfg.props; i++) {
+        actors.push({
+          id: idn("P"), name: `Prop_${i}`, kind: "prop",
+          location: { x: (rnd() - 0.5) * 1600, y: (rnd() - 0.5) * 1600, z: 0 },
+          tags: ["prop"], behavior: "idle",
+        });
+      }
+      for (let i = 0; i < cfg.npcs; i++) {
+        const hostile = cfg.hostile && i % 2 === 0;
+        actors.push({
+          id: idn("NPC"), name: `NPC_${i}`, kind: "npc",
+          location: { x: (rnd() - 0.5) * 1200, y: (rnd() - 0.5) * 1200, z: 92 },
+          tags: ["npc", hostile ? "hostile" : "friendly"],
+          behavior: hostile ? "attack" : "patrol",
+        });
+      }
+      return { map: cfg.map, weather: cfg.weather, time: cfg.time, actors, log: [] };
+    }
+
+    function diagnose(w) {
+      const findings = [];
+      const npcs = w.actors.filter((a) => a.kind === "npc");
+      let clustered = 0;
+      for (let i = 0; i < npcs.length; i++) {
+        for (let j = i + 1; j < npcs.length; j++) {
+          const dx = npcs[i].location.x - npcs[j].location.x;
+          const dy = npcs[i].location.y - npcs[j].location.y;
+          if (Math.hypot(dx, dy) < 120) clustered++;
+        }
+      }
+      if (clustered) findings.push(`NPC overlap risk (${clustered} close pairs)`);
+      if (w.weather === "rain" && w.time > 20) findings.push("Night + rain: boost key light");
+      const idleHostile = npcs.filter((a) => a.tags.includes("hostile") && a.behavior === "idle");
+      if (idleHostile.length) findings.push("Hostile NPCs idle — set attack");
+      if (!findings.length) findings.push("Level looks healthy");
+      return findings;
+    }
+
+    let scenario = "combat-arena";
+    let world = buildWorld(scenario);
+    const $ = (id) => document.getElementById(id);
+
+    function renderScen() {
+      $("scen").innerHTML = Object.entries(SCENARIOS).map(([id, s]) => `
+        <button class="sc ${id === scenario ? "on" : ""}" data-id="${id}" type="button">
+          <strong>${s.title}</strong>
+          <span class="meta">${s.blurb}</span>
+        </button>`).join("");
+      $("scen").querySelectorAll(".sc").forEach((el) => {
+        el.onclick = () => {
+          scenario = el.dataset.id;
+          world = buildWorld(scenario);
+          renderWorld();
+          $("status").textContent = `Loaded ${SCENARIOS[scenario].map} (sim backend)`;
+          renderScen();
+        };
+      });
+    }
+
+    function renderWorld() {
+      const npcs = world.actors.filter((a) => a.kind === "npc");
+      $("m-backend").textContent = "sim";
+      $("m-actors").textContent = String(world.actors.length);
+      $("m-npcs").textContent = String(npcs.length);
+      $("m-weather").textContent = world.weather;
+      $("actors").innerHTML = world.actors.map((a) => `
+        <div class="actor ${a.kind}">
+          <span>${a.id} · ${a.kind}${a.tags.includes("hostile") ? " · hostile" : ""}</span>
+          <span class="meta">${a.behavior || "—"} @ ${a.location.x.toFixed(0)},${a.location.y.toFixed(0)}</span>
+        </div>`).join("");
+    }
+
+    function pushTrace(kind, html) {
+      const el = document.createElement("div");
+      el.className = `ev ${kind}`;
+      el.innerHTML = html;
+      $("trace").prepend(el);
+    }
+
+    function runPlaybook(goal) {
+      $("trace").innerHTML = "";
+      const g = goal.toLowerCase();
+      pushTrace("tool_call", `<div class="meta">tool_call</div><strong>diagnose_level</strong>`);
+      const findings = diagnose(world);
+      pushTrace("tool_result", `<div class="meta">findings</div>${findings.join(" · ")}`);
+
+      pushTrace("tool_call", `<div class="meta">tool_call</div><strong>list_actors</strong> kind=npc`);
+      const npcs = world.actors.filter((a) => a.kind === "npc");
+
+      if (g.includes("rain") || g.includes("weather")) {
+        world.weather = g.includes("rain") ? "rain" : "clear";
+        pushTrace("tool_call", `<div class="meta">tool_call</div><strong>set_weather</strong> ${world.weather}`);
+      }
+      if (g.includes("night")) {
+        world.time = 22;
+        pushTrace("tool_call", `<div class="meta">tool_call</div><strong>set_time_of_day</strong> 22`);
+      }
+
+      if (g.includes("attack") || g.includes("hostile") || g.includes("combat") || scenario === "combat-arena") {
+        npcs.forEach((n) => {
+          if (n.tags.includes("hostile")) {
+            n.behavior = "attack";
+            pushTrace("tool_call", `<div class="meta">tool_call</div><strong>set_npc_behavior</strong> ${n.id} → attack`);
+          } else {
+            n.behavior = "patrol";
+          }
+        });
+      }
+
+      if (g.includes("spread") || g.includes("patrol") || findings.some((f) => f.includes("overlap"))) {
+        npcs.slice(0, 3).forEach((n, i) => {
+          n.location = { x: 200 * (i + 1), y: -150 * (i + 1), z: 92 };
+          n.behavior = "patrol";
+          pushTrace("tool_call", `<div class="meta">tool_call</div><strong>move_actor</strong> ${n.id}`);
+        });
+      }
+
+      if (g.includes("spawn") || g.includes("crate")) {
+        world.actors.push({
+          id: `A_${String(world.actors.length + 1).padStart(3, "0")}`,
+          name: "AgentCrate", kind: "prop",
+          location: { x: 300, y: 100, z: 0 }, tags: ["prop", "agent"], behavior: "idle",
+        });
+        pushTrace("tool_call", `<div class="meta">tool_call</div><strong>spawn_actor</strong> AgentCrate`);
+      }
+
+      const after = diagnose(world);
+      pushTrace("tool_call", `<div class="meta">tool_call</div><strong>inspect_level</strong>`);
+      pushTrace(
+        "assistant",
+        `Playbook finished on ${world.map}. Actors=${world.actors.length} weather=${world.weather}. ${after[0]}`
+      );
+      $("status").textContent = `Agent done · ${world.map} · ${world.actors.length} actors`;
+      renderWorld();
+    }
+
+    $("run").onclick = () => runPlaybook($("goal").value);
+    $("diagnose").onclick = () => {
+      $("trace").innerHTML = "";
+      pushTrace("tool_call", `<div class="meta">tool_call</div><strong>diagnose_level</strong>`);
+      pushTrace("tool_result", diagnose(world).map((f) => `• ${f}`).join("<br>"));
+      $("status").textContent = "Diagnose complete";
+    };
+    $("refresh").onclick = () => {
+      world = buildWorld(scenario);
+      renderWorld();
+      $("status").textContent = "Snapshot refreshed from sim seed";
+    };
+
+    renderScen();
+    renderWorld();
+  </script>
+</body>
+</html>
