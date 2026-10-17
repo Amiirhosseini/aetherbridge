@@ -781,7 +781,7 @@
       const hostile = a.tags.includes("hostile");
       const color = hostile ? "#ff3b4a" : "#3ddc97";
       const accent = hostile ? "#ff8a3d" : "#7dffc5";
-      const r = 18 * scale;
+      const r = 26 * scale;
 
       // ground shadow + aggro aura
       ctx.fillStyle = "rgba(0,0,0,0.45)";
@@ -814,10 +814,14 @@
       body.addColorStop(1, accent);
       ctx.fillStyle = body;
       ctx.beginPath();
-      ctx.roundRect(-r * 0.7, -r * 0.55, r * 1.4, r * 1.15, 6 * scale);
+      ctx.moveTo(-r * 0.55, -r * 0.55);
+      ctx.lineTo(r * 0.55, -r * 0.55);
+      ctx.lineTo(r * 0.7, r * 0.55);
+      ctx.lineTo(-r * 0.7, r * 0.55);
+      ctx.closePath();
       ctx.fill();
-      ctx.strokeStyle = "rgba(255,255,255,0.35)";
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = "rgba(255,255,255,0.45)";
+      ctx.lineWidth = 2;
       ctx.stroke();
 
       // head
