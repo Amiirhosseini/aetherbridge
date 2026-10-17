@@ -5,8 +5,8 @@ from __future__ import annotations
 import os
 from typing import Any
 
+from langchain.agents import create_agent
 from langchain_core.messages import AIMessage, HumanMessage
-from langgraph.prebuilt import create_react_agent
 
 from aetherbridge.agent.sim_llm import UnrealSimChatModel
 from aetherbridge.models import AgentTrace, BackendMode
@@ -32,6 +32,10 @@ def build_llm():
     return UnrealSimChatModel()
 
 
+def _make_graph(llm, tools):
+    return create_agent(llm, tools, system_prompt=SYSTEM)
+
+
 def build_agent(
     world: UnrealBackend | None = None,
     scenario: str = "plaza",
@@ -43,7 +47,7 @@ def build_agent(
     llm = build_llm()
     if isinstance(llm, UnrealSimChatModel):
         llm.turn = 0
-    graph = create_react_agent(llm, tools, prompt=SYSTEM)
+    graph = _make_graph(llm, tools)
     return graph, world, tools
 
 
@@ -58,7 +62,6 @@ def run_agent(
     if world is None:
         world, resolved = build_backend(mode=mode, scenario=scenario)
     else:
-        resolved = BackendMode.SIM
         snap = world.snapshot()
         resolved = snap.backend
 
@@ -66,7 +69,7 @@ def run_agent(
     llm = build_llm()
     if isinstance(llm, UnrealSimChatModel):
         llm.turn = 0
-    graph = create_react_agent(llm, tools, prompt=SYSTEM)
+    graph = _make_graph(llm, tools)
 
     result = graph.invoke(
         {"messages": [HumanMessage(content=goal)]},
