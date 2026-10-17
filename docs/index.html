@@ -11,166 +11,266 @@
     :root {
       --ink: #e8eef4;
       --muted: #8a9aab;
-      --void: #0b1218;
-      --panel: rgba(16, 28, 38, 0.82);
-      --line: rgba(120, 160, 180, 0.22);
+      --void: #070c12;
+      --panel: rgba(10, 18, 28, 0.88);
+      --line: rgba(120, 160, 180, 0.28);
       --ember: #e85d04;
       --cyan: #2ec4b6;
       --steel: #4a6fa5;
-      --shadow: 0 24px 60px rgba(0,0,0,.45);
+      --gold: #f4c430;
+      --hostile: #ff3b4a;
+      --friend: #3ddc97;
+      --shadow: 0 28px 70px rgba(0,0,0,.55);
     }
     * { box-sizing: border-box }
+    html, body { margin: 0 }
     body {
-      margin: 0; color: var(--ink); min-height: 100vh;
+      color: var(--ink);
       font-family: "IBM Plex Sans", system-ui, sans-serif;
+      background: #05080d;
+      min-height: 100vh;
+    }
+    .hero-stage {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+    .hero-stage::before {
+      content: "";
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
       background:
-        radial-gradient(900px 480px at 10% -10%, rgba(46,196,182,.18), transparent 55%),
-        radial-gradient(700px 400px at 95% 5%, rgba(232,93,4,.14), transparent 50%),
-        linear-gradient(165deg, #0a1016 0%, #121c28 45%, #0d151c 100%);
+        radial-gradient(1200px 600px at 20% -10%, rgba(46,196,182,.16), transparent 55%),
+        radial-gradient(900px 500px at 90% 10%, rgba(232,93,4,.18), transparent 50%),
+        linear-gradient(180deg, #0a121c 0%, #05080d 70%);
     }
-    body::before {
-      content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .35;
-      background-image:
-        linear-gradient(rgba(232,93,4,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(46,196,182,.04) 1px, transparent 1px);
-      background-size: 36px 36px;
-      mask-image: linear-gradient(#000, transparent 85%);
+    .topbar {
+      position: relative; z-index: 3;
+      width: min(1280px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 1.4rem 0 0.8rem;
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;
+      justify-content: space-between;
+      animation: rise .7s ease both;
     }
-    .wrap { width: min(1140px, calc(100% - 2rem)); margin: 0 auto; position: relative }
-    .hero { padding: 3.4rem 0 1.2rem; animation: rise .65s ease both }
+    .brand-block { max-width: 34rem }
     .brand {
       font-family: Syne, sans-serif; font-weight: 800;
-      font-size: clamp(2.5rem, 7vw, 4rem); margin: 0 0 .45rem;
-      letter-spacing: -.03em; line-height: .95;
+      font-size: clamp(2.4rem, 6vw, 3.8rem); margin: 0 0 .35rem;
+      letter-spacing: -.03em; line-height: .92;
+      text-shadow: 0 0 40px rgba(232,93,4,.25);
     }
     .brand span { color: var(--ember) }
-    .lede { max-width: 36rem; color: var(--muted); font-size: 1.05rem; margin: 0 0 1.1rem; line-height: 1.45 }
-    .row { display: flex; flex-wrap: wrap; gap: .5rem }
+    .lede {
+      margin: 0; color: var(--muted); font-size: .98rem; line-height: 1.45;
+    }
+    .lede strong { color: var(--ink) }
+    .controls { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center }
     .btn {
       border: 1px solid var(--ember); background: var(--ember); color: #120a04;
-      border-radius: 10px; padding: .62rem 1.05rem; font: inherit; font-weight: 700; cursor: pointer;
-      transition: transform .15s ease, box-shadow .15s ease;
+      border-radius: 10px; padding: .62rem 1.05rem; font: inherit; font-weight: 700;
+      cursor: pointer; transition: transform .15s ease, box-shadow .15s ease;
     }
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(232,93,4,.35) }
-    .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line) }
-    .status {
-      margin-top: .95rem; padding: .7rem 1rem; border-radius: 10px;
-      background: rgba(46,196,182,.08); border: 1px solid rgba(46,196,182,.28);
-      font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: #b8eae4;
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(232,93,4,.4) }
+    .btn:disabled { opacity: .55; cursor: wait; transform: none; box-shadow: none }
+    .btn.ghost { background: rgba(8,14,20,.55); color: var(--ink); border-color: var(--line); backdrop-filter: blur(8px) }
+
+    .viewport-wrap {
+      position: relative; z-index: 2;
+      width: min(1280px, calc(100% - 1.2rem));
+      margin: 0 auto 1rem;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(180,210,230,.22);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,.04);
+      background: #0a1018;
+      min-height: min(68vh, 720px);
+      animation: rise .85s ease both;
     }
-    .grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 1rem; padding-bottom: 2.4rem }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr } }
+    #arena {
+      display: block; width: 100%; height: min(68vh, 720px);
+      background: #0a1018; cursor: crosshair;
+    }
+    .hud {
+      position: absolute; inset: 0; pointer-events: none;
+      display: grid; grid-template-rows: auto 1fr auto;
+      padding: .75rem;
+    }
+    .hud-top, .hud-bot {
+      display: flex; flex-wrap: wrap; gap: .45rem; justify-content: space-between; align-items: flex-start;
+    }
+    .chip {
+      pointer-events: none;
+      font-family: "IBM Plex Mono", monospace; font-size: .72rem;
+      padding: .35rem .55rem; border-radius: 8px;
+      background: rgba(5,10,16,.72); border: 1px solid rgba(140,180,200,.25);
+      backdrop-filter: blur(8px); color: #cfe7e4;
+    }
+    .chip strong { color: var(--gold); font-weight: 600 }
+    .chip.warn { border-color: rgba(255,59,74,.45); color: #ffc4c9 }
+    .chip.ok { border-color: rgba(46,196,182,.45) }
+    .float-toast {
+      position: absolute; left: 50%; top: 18%; transform: translateX(-50%);
+      font-family: Syne, sans-serif; font-weight: 700; font-size: 1.05rem;
+      padding: .55rem 1rem; border-radius: 999px;
+      background: rgba(232,93,4,.92); color: #120a04;
+      opacity: 0; transition: opacity .25s ease, transform .25s ease;
+      pointer-events: none; white-space: nowrap;
+      box-shadow: 0 12px 40px rgba(232,93,4,.35);
+    }
+    .float-toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px) }
+
+    .below {
+      position: relative; z-index: 2;
+      width: min(1280px, calc(100% - 2rem));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 1rem;
+      padding-bottom: 2.5rem;
+    }
+    @media (max-width: 960px) { .below { grid-template-columns: 1fr } }
     .panel {
-      background: var(--panel); backdrop-filter: blur(10px);
-      border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow);
-      padding: 1.05rem; animation: rise .8s ease both;
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 16px; padding: 1.05rem; box-shadow: var(--shadow);
+      animation: rise .9s ease both;
     }
-    h2 { font-family: Syne, sans-serif; font-size: 1.2rem; margin: 0 0 .4rem; font-weight: 700 }
-    .hint { color: var(--muted); font-size: .86rem; margin: 0 0 .65rem }
-    .scen { display: grid; grid-template-columns: repeat(3, 1fr); gap: .45rem; margin-bottom: .75rem }
+    h2 { font-family: Syne, sans-serif; font-size: 1.15rem; margin: 0 0 .35rem }
+    .hint { color: var(--muted); font-size: .84rem; margin: 0 0 .65rem }
+    .scen { display: grid; grid-template-columns: repeat(3, 1fr); gap: .45rem; margin-bottom: .7rem }
     @media (max-width: 700px) { .scen { grid-template-columns: 1fr } }
     .sc {
-      border: 1px solid var(--line); background: rgba(8,14,20,.6); border-radius: 12px;
-      padding: .65rem; cursor: pointer; text-align: left; font: inherit; color: var(--ink);
-      transition: border-color .15s ease;
+      border: 1px solid var(--line); background: rgba(8,14,20,.65); border-radius: 12px;
+      padding: .7rem; cursor: pointer; text-align: left; font: inherit; color: var(--ink);
+      transition: border-color .15s, transform .15s;
     }
-    .sc.on { border-color: var(--cyan); box-shadow: 0 0 0 1px rgba(46,196,182,.35) }
+    .sc:hover { transform: translateY(-1px) }
+    .sc.on { border-color: var(--cyan); box-shadow: 0 0 0 1px rgba(46,196,182,.35), inset 0 0 24px rgba(46,196,182,.06) }
     .sc strong { display: block; margin-bottom: .15rem; font-family: Syne, sans-serif }
-    .meters { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; margin: .55rem 0 }
+    .meters { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; margin: .5rem 0 .7rem }
     @media (max-width: 700px) { .meters { grid-template-columns: repeat(2, 1fr) } }
     .meter {
-      background: rgba(8,14,20,.7); border: 1px solid var(--line);
+      background: rgba(8,14,20,.75); border: 1px solid var(--line);
       border-radius: 10px; padding: .5rem; text-align: center;
     }
-    .meter .k { font-size: .68rem; color: var(--muted) }
-    .meter .v { font-family: Syne, sans-serif; font-size: 1.1rem; color: var(--cyan) }
+    .meter .k { font-size: .66rem; color: var(--muted) }
+    .meter .v { font-family: Syne, sans-serif; font-size: 1.05rem; color: var(--cyan) }
     .goal {
-      width: 100%; margin: .4rem 0 .7rem; padding: .65rem .75rem; border-radius: 10px;
-      border: 1px solid var(--line); background: rgba(8,14,20,.75); color: var(--ink);
-      font: inherit; resize: vertical; min-height: 3.2rem;
+      width: 100%; margin: .35rem 0 .65rem; padding: .65rem .75rem; border-radius: 10px;
+      border: 1px solid var(--line); background: rgba(8,14,20,.8); color: var(--ink);
+      font: inherit; resize: vertical; min-height: 3rem;
     }
-    .actors {
-      display: grid; gap: .3rem; max-height: 220px; overflow: auto;
-      font-family: "IBM Plex Mono", monospace; font-size: .74rem;
+    .legend {
+      display: flex; flex-wrap: wrap; gap: .55rem; margin-top: .4rem;
+      font-family: "IBM Plex Mono", monospace; font-size: .7rem; color: var(--muted);
     }
-    .actor {
-      display: grid; grid-template-columns: 1fr auto; gap: .4rem;
-      padding: .35rem .5rem; border-radius: 8px; background: rgba(8,14,20,.65);
-      border-left: 3px solid var(--steel);
-    }
-    .actor.npc { border-color: var(--ember) }
-    .actor.prop { border-color: var(--cyan) }
-    .trace { display: grid; gap: .35rem; max-height: 520px; overflow: auto }
+    .dot { width: .65rem; height: .65rem; border-radius: 50%; display: inline-block; margin-right: .25rem; vertical-align: -1px }
+    .trace { display: grid; gap: .35rem; max-height: 420px; overflow: auto }
     .ev {
-      border-left: 3px solid var(--cyan); background: rgba(8,14,20,.7);
+      border-left: 3px solid var(--cyan); background: rgba(8,14,20,.75);
       border-radius: 0 10px 10px 0; padding: .45rem .6rem; font-size: .84rem;
       animation: slide .22s ease both;
     }
     .ev.tool_call { border-color: var(--ember) }
     .ev.assistant { border-color: var(--steel); font-weight: 600 }
+    .ev.fx { border-color: var(--gold) }
     .meta { font-family: "IBM Plex Mono", monospace; font-size: .68rem; color: var(--muted) }
-    footer { padding: 1rem 0 2.2rem; color: var(--muted); font-size: .85rem; border-top: 1px solid var(--line) }
+    .status {
+      margin-top: .55rem; padding: .65rem .85rem; border-radius: 10px;
+      background: rgba(46,196,182,.08); border: 1px solid rgba(46,196,182,.28);
+      font-family: "IBM Plex Mono", monospace; font-size: .78rem; color: #b8eae4;
+    }
+    footer {
+      width: min(1280px, calc(100% - 2rem)); margin: 0 auto;
+      padding: 1rem 0 2.4rem; color: var(--muted); font-size: .85rem;
+      border-top: 1px solid var(--line);
+    }
     footer a { color: var(--cyan) }
-    @keyframes rise { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: none } }
     @keyframes slide { from { opacity: 0; transform: translateX(-6px) } to { opacity: 1; transform: none } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="hero">
-      <h1 class="brand">Aether<span>Bridge</span></h1>
-      <p class="lede">
-        LangChain agents that operate <strong>Unreal Engine</strong> —
-        level inspect, spawn/move actors, NPC behaviors, weather, and Remote Control (:30010),
-        with a deterministic sim when the editor is offline.
-      </p>
-      <div class="row">
+  <div class="hero-stage">
+    <div class="topbar">
+      <div class="brand-block">
+        <h1 class="brand">Aether<span>Bridge</span></h1>
+        <p class="lede">
+          Watch a LangChain agent <strong>operate an Unreal level</strong> —
+          NPCs move, hostiles attack, weather shifts, crates spawn — same tools as Remote Control (:30010).
+        </p>
+      </div>
+      <div class="controls">
         <button class="btn" id="run" type="button">Run UE agent</button>
-        <button class="btn ghost" id="diagnose" type="button">Diagnose level</button>
-        <button class="btn ghost" id="refresh" type="button">Refresh snapshot</button>
+        <button class="btn ghost" id="diagnose" type="button">Diagnose</button>
+        <button class="btn ghost" id="refresh" type="button">Reset level</button>
         <a class="btn ghost" href="https://github.com/Amiirhosseini/aetherbridge" target="_blank" rel="noreferrer">GitHub</a>
       </div>
-      <div class="status" id="status">Pick a scenario — agent uses the built-in Unreal sim (same tools as live Remote Control).</div>
-    </header>
+    </div>
 
-    <section class="grid">
-      <div class="panel">
-        <h2>Unreal world</h2>
-        <p class="hint">Scenarios mirror UE maps. Live editor: enable Remote Control + AetherBridge plugin.</p>
-        <div class="scen" id="scen"></div>
-        <div class="meters">
-          <div class="meter"><div class="k">Backend</div><div class="v" id="m-backend">sim</div></div>
-          <div class="meter"><div class="k">Actors</div><div class="v" id="m-actors">0</div></div>
-          <div class="meter"><div class="k">NPCs</div><div class="v" id="m-npcs">0</div></div>
-          <div class="meter"><div class="k">Weather</div><div class="v" id="m-weather">—</div></div>
+    <div class="viewport-wrap">
+      <canvas id="arena" width="1600" height="900" aria-label="Unreal level viewport"></canvas>
+      <div class="hud">
+        <div class="hud-top">
+          <div class="chip ok" id="hud-map"><strong>MAP</strong> —</div>
+          <div class="chip" id="hud-clock"><strong>TOD</strong> —</div>
+          <div class="chip" id="hud-wx"><strong>WX</strong> —</div>
         </div>
-        <label class="hint" for="goal">Agent goal</label>
-        <textarea class="goal" id="goal">Diagnose the level, spread NPCs, and set hostile units to attack.</textarea>
-        <div class="hint">Actors</div>
-        <div class="actors" id="actors"></div>
+        <div></div>
+        <div class="hud-bot">
+          <div class="chip" id="hud-sel"><strong>FOCUS</strong> level</div>
+          <div class="chip warn" id="hud-alert">agent idle</div>
+        </div>
       </div>
-      <div class="panel">
-        <h2>Agent trace</h2>
-        <p class="hint">diagnose → list_actors → remediate → inspect_level</p>
-        <div class="trace" id="trace"></div>
-      </div>
-    </section>
-
-    <footer>
-      AetherBridge · Unreal Engine AI agents ·
-      <a href="https://github.com/Amiirhosseini/aetherbridge">source</a> ·
-      <a href="https://amiirhosseini.com/aetherbridge/">demo</a>
-    </footer>
+      <div class="float-toast" id="toast">Agent step</div>
+    </div>
   </div>
+
+  <section class="below">
+    <div class="panel">
+      <h2>Mission control</h2>
+      <p class="hint">Pick a map seed. The viewport is a live top-down read of the sim world the agent edits.</p>
+      <div class="scen" id="scen"></div>
+      <div class="meters">
+        <div class="meter"><div class="k">Backend</div><div class="v" id="m-backend">sim</div></div>
+        <div class="meter"><div class="k">Actors</div><div class="v" id="m-actors">0</div></div>
+        <div class="meter"><div class="k">NPCs</div><div class="v" id="m-npcs">0</div></div>
+        <div class="meter"><div class="k">Weather</div><div class="v" id="m-weather">—</div></div>
+      </div>
+      <label class="hint" for="goal">Agent goal</label>
+      <textarea class="goal" id="goal">Diagnose the level, spread NPCs, and set hostile units to attack.</textarea>
+      <div class="legend">
+        <span><i class="dot" style="background:#ff3b4a"></i>hostile NPC</span>
+        <span><i class="dot" style="background:#3ddc97"></i>friendly NPC</span>
+        <span><i class="dot" style="background:#2ec4b6"></i>prop / crate</span>
+        <span><i class="dot" style="background:#f4c430"></i>player start</span>
+        <span><i class="dot" style="background:#7eb6ff"></i>light</span>
+      </div>
+      <div class="status" id="status">Viewport live — press Run UE agent to watch tools mutate the level.</div>
+    </div>
+    <div class="panel">
+      <h2>Agent trace</h2>
+      <p class="hint">Each tool call animates in the viewport before the next step.</p>
+      <div class="trace" id="trace"></div>
+    </div>
+  </section>
+
+  <footer>
+    AetherBridge · Unreal Engine AI agents ·
+    <a href="https://github.com/Amiirhosseini/aetherbridge">source</a> ·
+    <a href="https://amiirhosseini.com/aetherbridge/">demo</a>
+  </footer>
 
   <script>
     const SCENARIOS = {
       plaza: { title: "Agent Plaza", map: "/Game/Maps/AgentPlaza", blurb: "Clear day, patrol NPCs" },
       "combat-arena": { title: "Combat Arena", map: "/Game/Maps/CombatArena", blurb: "Hostile mix, overcast" },
-      "night-city": { title: "Night Block", map: "/Game/Maps/NightBlock", blurb: "Rain + night lighting" },
+      "night-city": { title: "Night Block", map: "/Game/Maps/NightBlock", blurb: "Rain + neon night" },
     };
-
-    // Embedded deterministic sim (mirrors Python UnrealSimWorld) for static Pages.
     const SEEDS = {
       plaza: { map: "/Game/Maps/AgentPlaza", weather: "clear", time: 12, seed: 11, npcs: 3, props: 6, hostile: false },
       "combat-arena": { map: "/Game/Maps/CombatArena", weather: "overcast", time: 12, seed: 22, npcs: 5, props: 4, hostile: true },
@@ -192,26 +292,29 @@
       let seq = 0;
       const idn = (p) => `${p}_${String(++seq).padStart(3, "0")}`;
       const actors = [
-        { id: idn("PS"), name: "PlayerStart", kind: "player_start", location: { x: 0, y: 0, z: 92 }, tags: ["spawn"], behavior: "idle" },
-        { id: idn("L"), name: "SunLight", kind: "light", location: { x: 0, y: 0, z: 500 }, tags: ["lighting"], behavior: "idle" },
+        { id: idn("PS"), name: "PlayerStart", kind: "player_start", location: { x: 0, y: 0, z: 92 }, tags: ["spawn"], behavior: "idle", yaw: 0, hp: 100, flash: 0 },
+        { id: idn("L"), name: "SunLight", kind: "light", location: { x: 120, y: -80, z: 500 }, tags: ["lighting"], behavior: "idle", yaw: 0, hp: 100, flash: 0 },
       ];
       for (let i = 0; i < cfg.props; i++) {
         actors.push({
           id: idn("P"), name: `Prop_${i}`, kind: "prop",
-          location: { x: (rnd() - 0.5) * 1600, y: (rnd() - 0.5) * 1600, z: 0 },
-          tags: ["prop"], behavior: "idle",
+          location: { x: (rnd() - 0.5) * 1400, y: (rnd() - 0.5) * 1400, z: 0 },
+          tags: ["prop"], behavior: "idle", yaw: rnd() * Math.PI * 2, hp: 100, flash: 0,
         });
       }
       for (let i = 0; i < cfg.npcs; i++) {
         const hostile = cfg.hostile && i % 2 === 0;
         actors.push({
           id: idn("NPC"), name: `NPC_${i}`, kind: "npc",
-          location: { x: (rnd() - 0.5) * 1200, y: (rnd() - 0.5) * 1200, z: 92 },
+          location: { x: (rnd() - 0.5) * 1100, y: (rnd() - 0.5) * 1100, z: 92 },
           tags: ["npc", hostile ? "hostile" : "friendly"],
           behavior: hostile ? "attack" : "patrol",
+          yaw: rnd() * Math.PI * 2, hp: 100, flash: 0,
+          patrolPhase: rnd() * Math.PI * 2,
+          attackCd: rnd() * 1.2,
         });
       }
-      return { map: cfg.map, weather: cfg.weather, time: cfg.time, actors, log: [] };
+      return { map: cfg.map, weather: cfg.weather, time: cfg.time, actors, log: [], focusId: null };
     }
 
     function diagnose(w) {
@@ -233,38 +336,793 @@
       return findings;
     }
 
+    // ---- Canvas viewport ----
+    const canvas = document.getElementById("arena");
+    const ctx = canvas.getContext("2d");
+    const WORLD = 1600; // world units mapped into view
     let scenario = "combat-arena";
     let world = buildWorld(scenario);
+    let particles = [];
+    let ripples = [];
+    let floaters = [];
+    let beams = [];
+    let shake = 0;
+    let cam = { x: 0, y: 0, zoom: 1.45, tx: 0, ty: 0 };
+    let lastTs = performance.now();
+    let runningAgent = false;
+    let scanAngle = 0;
+    let rainDrops = Array.from({ length: 220 }, () => ({
+      x: Math.random(), y: Math.random(), z: Math.random(), len: 8 + Math.random() * 16, sp: 0.35 + Math.random() * 0.55,
+    }));
+    let fogPuffs = Array.from({ length: 18 }, (_, i) => ({
+      x: Math.random(), y: Math.random(), r: 80 + Math.random() * 140, a: 0.04 + Math.random() * 0.06, ph: i,
+    }));
+
     const $ = (id) => document.getElementById(id);
 
-    function renderScen() {
-      $("scen").innerHTML = Object.entries(SCENARIOS).map(([id, s]) => `
-        <button class="sc ${id === scenario ? "on" : ""}" data-id="${id}" type="button">
-          <strong>${s.title}</strong>
-          <span class="meta">${s.blurb}</span>
-        </button>`).join("");
-      $("scen").querySelectorAll(".sc").forEach((el) => {
-        el.onclick = () => {
-          scenario = el.dataset.id;
-          world = buildWorld(scenario);
-          renderWorld();
-          $("status").textContent = `Loaded ${SCENARIOS[scenario].map} (sim backend)`;
-          renderScen();
-        };
+    function worldToScreen(x, y) {
+      const w = canvas.clientWidth || canvas.width;
+      const h = canvas.clientHeight || canvas.height;
+      const scale = Math.min(w, h) / WORLD * cam.zoom;
+      const sx = w / 2 + (x - cam.x) * scale;
+      const sy = h / 2 + (y - cam.y) * scale;
+      return { sx, sy, scale };
+    }
+
+    function resizeCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener("resize", resizeCanvas);
+
+    function toast(msg) {
+      const el = $("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 900);
+    }
+
+    function addParticles(x, y, color, n = 18, speed = 120) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const s = speed * (0.4 + Math.random());
+        particles.push({
+          x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+          life: 0.5 + Math.random() * 0.6, max: 0.7 + Math.random() * 0.5,
+          color, size: 2 + Math.random() * 3,
+        });
+      }
+    }
+
+    function addRipple(x, y, color) {
+      ripples.push({ x, y, r: 8, max: 90, life: 1, color });
+    }
+
+    function addFloater(x, y, text, color) {
+      floaters.push({ x, y, text, color, life: 1.2 });
+    }
+
+    function addBeam(x1, y1, x2, y2, color) {
+      beams.push({ x1, y1, x2, y2, life: 0.45, color });
+    }
+
+    function focusActor(id) {
+      world.focusId = id;
+      const a = world.actors.find((x) => x.id === id);
+      if (a) {
+        cam.tx = a.location.x;
+        cam.ty = a.location.y;
+        $("hud-sel").innerHTML = `<strong>FOCUS</strong> ${a.name} · ${a.behavior}`;
+      }
+    }
+
+    function sleep(ms) {
+      return new Promise((r) => setTimeout(r, ms));
+    }
+
+    function animateMove(actor, nx, ny, dur = 700) {
+      return new Promise((resolve) => {
+        const ox = actor.location.x;
+        const oy = actor.location.y;
+        const t0 = performance.now();
+        focusActor(actor.id);
+        addRipple(ox, oy, "#2ec4b6");
+        toast(`move_actor ${actor.id}`);
+        function step(t) {
+          const u = Math.min(1, (t - t0) / dur);
+          const e = 1 - Math.pow(1 - u, 3);
+          actor.location.x = ox + (nx - ox) * e;
+          actor.location.y = oy + (ny - oy) * e;
+          actor.yaw = Math.atan2(ny - oy, nx - ox);
+          cam.tx = actor.location.x;
+          cam.ty = actor.location.y;
+          if (u < 1) requestAnimationFrame(step);
+          else {
+            addParticles(nx, ny, "#2ec4b6", 14, 90);
+            addFloater(nx, ny - 30, "MOVED", "#2ec4b6");
+            resolve();
+          }
+        }
+        requestAnimationFrame(step);
       });
     }
 
-    function renderWorld() {
-      const npcs = world.actors.filter((a) => a.kind === "npc");
+    function animateAttack(actor) {
+      return new Promise((resolve) => {
+        focusActor(actor.id);
+        actor.behavior = "attack";
+        actor.flash = 1;
+        shake = 10;
+        const targets = world.actors.filter((a) => a.kind === "npc" && a.id !== actor.id && !a.tags.includes("hostile"));
+        const target = targets[0] || world.actors.find((a) => a.kind === "player_start");
+        if (target) {
+          addBeam(actor.location.x, actor.location.y, target.location.x, target.location.y, "#ff3b4a");
+          addParticles(target.location.x, target.location.y, "#ff3b4a", 28, 180);
+          addRipple(target.location.x, target.location.y, "#ff3b4a");
+          addFloater(target.location.x, target.location.y - 40, "-24", "#ff3b4a");
+          target.flash = 1;
+          target.hp = Math.max(20, (target.hp || 100) - 24);
+        }
+        addParticles(actor.location.x, actor.location.y, "#e85d04", 20, 140);
+        toast(`set_npc_behavior ${actor.id} → attack`);
+        setTimeout(resolve, 480);
+      });
+    }
+
+    function animateSpawn(actor) {
+      return new Promise((resolve) => {
+        focusActor(actor.id);
+        actor.flash = 1.2;
+        shake = 6;
+        addRipple(actor.location.x, actor.location.y, "#f4c430");
+        addParticles(actor.location.x, actor.location.y, "#f4c430", 36, 200);
+        addFloater(actor.location.x, actor.location.y - 40, "SPAWN", "#f4c430");
+        toast(`spawn_actor ${actor.name}`);
+        cam.tx = actor.location.x;
+        cam.ty = actor.location.y;
+        setTimeout(resolve, 650);
+      });
+    }
+
+    function animateWeather(kind) {
+      return new Promise((resolve) => {
+        toast(`set_weather ${kind}`);
+        addFloater(cam.x, cam.y - 80, kind.toUpperCase(), "#7eb6ff");
+        for (let i = 0; i < 40; i++) {
+          addParticles(
+            cam.x + (Math.random() - 0.5) * 900,
+            cam.y + (Math.random() - 0.5) * 600,
+            kind === "rain" ? "#7eb6ff" : "#f4c430",
+            3,
+            40
+          );
+        }
+        setTimeout(resolve, 500);
+      });
+    }
+
+    function skyColors(time, weather) {
+      const night = time >= 19 || time < 6;
+      if (weather === "rain" && night) return { top: "#050914", mid: "#0b1830", bot: "#101820", tint: "rgba(40,90,160,.22)" };
+      if (weather === "rain") return { top: "#1a2430", mid: "#243040", bot: "#2a3540", tint: "rgba(80,120,160,.18)" };
+      if (weather === "overcast") return { top: "#1c2430", mid: "#2a3340", bot: "#333c48", tint: "rgba(120,130,140,.12)" };
+      if (night) return { top: "#050812", mid: "#0c1630", bot: "#152038", tint: "rgba(30,50,120,.2)" };
+      return { top: "#1a3a55", mid: "#3d6a7a", bot: "#6b8f6a", tint: "rgba(255,200,80,.08)" };
+    }
+
+    function drawGrid(w, h, scale) {
+      ctx.save();
+      ctx.strokeStyle = "rgba(140,180,200,0.08)";
+      ctx.lineWidth = 1;
+      const step = 100 * scale;
+      const origin = worldToScreen(0, 0);
+      const ox = ((origin.sx % step) + step) % step;
+      const oy = ((origin.sy % step) + step) % step;
+      for (let x = ox - step; x < w + step; x += step) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = oy - step; y < h + step; y += step) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+      // axes
+      ctx.strokeStyle = "rgba(232,93,4,0.35)";
+      ctx.beginPath(); ctx.moveTo(origin.sx, 0); ctx.lineTo(origin.sx, h); ctx.stroke();
+      ctx.strokeStyle = "rgba(46,196,182,0.35)";
+      ctx.beginPath(); ctx.moveTo(0, origin.sy); ctx.lineTo(w, origin.sy); ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawBuilding(x, y, w, d, h, fill, stroke) {
+      const s = worldToScreen(x, y);
+      const sc = s.scale;
+      const bw = w * sc, bd = d * sc, bh = h * sc;
+      // top
+      ctx.fillStyle = fill;
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(s.sx, s.sy - bh);
+      ctx.lineTo(s.sx + bw, s.sy - bh + bd * 0.35);
+      ctx.lineTo(s.sx, s.sy - bh + bd * 0.7);
+      ctx.lineTo(s.sx - bw, s.sy - bh + bd * 0.35);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      // left face
+      ctx.fillStyle = "rgba(0,0,0,0.28)";
+      ctx.beginPath();
+      ctx.moveTo(s.sx - bw, s.sy - bh + bd * 0.35);
+      ctx.lineTo(s.sx, s.sy - bh + bd * 0.7);
+      ctx.lineTo(s.sx, s.sy + bd * 0.35);
+      ctx.lineTo(s.sx - bw, s.sy);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      // right face
+      ctx.fillStyle = "rgba(255,255,255,0.08)";
+      ctx.beginPath();
+      ctx.moveTo(s.sx + bw, s.sy - bh + bd * 0.35);
+      ctx.lineTo(s.sx, s.sy - bh + bd * 0.7);
+      ctx.lineTo(s.sx, s.sy + bd * 0.35);
+      ctx.lineTo(s.sx + bw, s.sy);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      // neon windows for night
+      if (scenario === "night-city") {
+        for (let i = 0; i < 3; i++) {
+          ctx.fillStyle = i % 2 ? "rgba(255,80,180,0.55)" : "rgba(80,200,255,0.55)";
+          ctx.fillRect(s.sx - bw * 0.45 + i * bw * 0.28, s.sy - bh * 0.55, bw * 0.12, bh * 0.18);
+        }
+      }
+    }
+
+    function drawGroundDecals(scale) {
+      // textured arena floor plate
+      const floor = worldToScreen(0, 0);
+      ctx.save();
+      ctx.translate(floor.sx, floor.sy);
+      ctx.fillStyle = scenario === "night-city" ? "rgba(20,28,48,0.55)" : "rgba(40,48,58,0.5)";
+      ctx.beginPath();
+      ctx.rect(-720 * scale, -720 * scale, 1440 * scale, 1440 * scale);
+      ctx.fill();
+      // concrete tiles
+      ctx.strokeStyle = "rgba(255,255,255,0.04)";
+      ctx.lineWidth = 1;
+      for (let i = -7; i <= 7; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * 100 * scale, -720 * scale);
+        ctx.lineTo(i * 100 * scale, 720 * scale);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-720 * scale, i * 100 * scale);
+        ctx.lineTo(720 * scale, i * 100 * scale);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // cover blocks / barriers
+      const covers = scenario === "combat-arena"
+        ? [[-220, -180, 70, 40], [250, 160, 90, 40], [-80, 300, 60, 60], [420, -340, 80, 50], [-480, 80, 100, 40]]
+        : scenario === "night-city"
+          ? [[-500, -200, 120, 80], [480, 140, 100, 100], [-200, 420, 140, 70], [200, -450, 90, 90]]
+          : [[-300, 200, 80, 50], [350, -150, 70, 70]];
+      for (const [x, y, w, d] of covers) {
+        drawBuilding(x, y, w * 0.45, d, 28, "rgba(90,100,115,0.85)", "rgba(200,210,220,0.25)");
+      }
+
+      if (scenario === "night-city") {
+        drawBuilding(-420, -320, 55, 70, 120, "rgba(35,45,70,0.95)", "rgba(120,160,255,0.35)");
+        drawBuilding(380, -280, 60, 75, 150, "rgba(40,35,60,0.95)", "rgba(255,100,180,0.35)");
+        drawBuilding(-100, 380, 70, 60, 90, "rgba(30,50,55,0.95)", "rgba(80,255,200,0.3)");
+        // road
+        for (let i = -6; i <= 6; i++) {
+          const a = worldToScreen(i * 100, 0);
+          ctx.fillStyle = "rgba(255,220,80,0.35)";
+          ctx.fillRect(a.sx - 8 * scale, a.sy - 2 * scale, 16 * scale, 4 * scale);
+        }
+      }
+
+      if (scenario === "combat-arena") {
+        const corners = [[-700, -700], [700, -700], [700, 700], [-700, 700]];
+        ctx.beginPath();
+        corners.forEach(([x, y], i) => {
+          const s = worldToScreen(x, y);
+          if (i === 0) ctx.moveTo(s.sx, s.sy); else ctx.lineTo(s.sx, s.sy);
+        });
+        ctx.closePath();
+        ctx.strokeStyle = "rgba(255,59,74,0.45)";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        // hazard stripes on walls
+        for (let i = -6; i <= 6; i++) {
+          const s = worldToScreen(i * 100, -700);
+          ctx.fillStyle = i % 2 ? "rgba(255,200,0,0.35)" : "rgba(20,20,20,0.4)";
+          ctx.fillRect(s.sx - 40 * scale, s.sy - 8 * scale, 80 * scale, 12 * scale);
+        }
+      }
+
+      if (scenario === "plaza") {
+        const pads = [
+          { x: 0, y: 0, r: 200, c: "rgba(232,93,4,0.16)" },
+          { x: 400, y: -300, r: 100, c: "rgba(46,196,182,0.14)" },
+          { x: -350, y: 280, r: 120, c: "rgba(74,111,165,0.16)" },
+        ];
+        for (const p of pads) {
+          const s = worldToScreen(p.x, p.y);
+          ctx.beginPath();
+          ctx.arc(s.sx, s.sy, p.r * scale, 0, Math.PI * 2);
+          ctx.fillStyle = p.c;
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255,255,255,0.12)";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+        // fountain
+        const f = worldToScreen(0, 0);
+        ctx.fillStyle = "rgba(80,180,220,0.35)";
+        ctx.beginPath(); ctx.arc(f.sx, f.sy, 40 * scale, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(180,230,255,0.5)";
+        ctx.stroke();
+      }
+    }
+
+    function drawCrate(sx, sy, scale, accent, flash) {
+      const s = 18 * scale;
+      const h = 14 * scale;
+      // shadow
+      ctx.fillStyle = "rgba(0,0,0,0.4)";
+      ctx.beginPath();
+      ctx.ellipse(sx, sy + s * 0.7, s * 1.1, s * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // iso crate
+      ctx.fillStyle = accent;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy - h);
+      ctx.lineTo(sx + s, sy - h * 0.35);
+      ctx.lineTo(sx, sy + h * 0.25);
+      ctx.lineTo(sx - s, sy - h * 0.35);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.beginPath();
+      ctx.moveTo(sx - s, sy - h * 0.35);
+      ctx.lineTo(sx, sy + h * 0.25);
+      ctx.lineTo(sx, sy + h * 0.25 + h);
+      ctx.lineTo(sx - s, sy - h * 0.35 + h);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.12)";
+      ctx.beginPath();
+      ctx.moveTo(sx + s, sy - h * 0.35);
+      ctx.lineTo(sx, sy + h * 0.25);
+      ctx.lineTo(sx, sy + h * 0.25 + h);
+      ctx.lineTo(sx + s, sy - h * 0.35 + h);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.4)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      // strap
+      ctx.strokeStyle = "rgba(0,0,0,0.35)";
+      ctx.beginPath();
+      ctx.moveTo(sx - s * 0.5, sy - h * 0.2);
+      ctx.lineTo(sx + s * 0.5, sy - h * 0.2);
+      ctx.stroke();
+      if (flash > 0) {
+        ctx.beginPath();
+        ctx.arc(sx, sy, 36 * scale * (0.8 + flash), 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(244,196,48,${flash})`;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+    }
+
+    function drawActor(a, t) {
+      const { sx, sy, scale } = worldToScreen(a.location.x, a.location.y);
+      const bob = a.kind === "npc" ? Math.sin(t * 5 + (a.patrolPhase || 0)) * 3 * scale : 0;
+      const flash = a.flash || 0;
+
+      if (a.kind === "prop") {
+        drawCrate(sx, sy + bob, scale, a.tags.includes("agent") ? "#f4c430" : "#2ec4b6", flash);
+        ctx.font = `600 ${Math.max(10, 10 * scale)}px "IBM Plex Mono"`;
+        ctx.fillStyle = "rgba(200,240,235,0.9)";
+        ctx.textAlign = "center";
+        ctx.fillText(a.name, sx, sy - 28 * scale);
+        return;
+      }
+
+      if (a.kind === "light") {
+        const pulse = 0.55 + Math.sin(t * 2) * 0.2;
+        const g = ctx.createRadialGradient(sx, sy, 2, sx, sy, 110 * scale);
+        g.addColorStop(0, `rgba(255,230,140,${0.65 * pulse})`);
+        g.addColorStop(0.4, `rgba(255,180,60,${0.2 * pulse})`);
+        g.addColorStop(1, "rgba(255,230,150,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(sx, sy, 110 * scale, 0, Math.PI * 2); ctx.fill();
+        // lamp post
+        ctx.fillStyle = "#c8d0d8";
+        ctx.fillRect(sx - 3 * scale, sy - 40 * scale, 6 * scale, 40 * scale);
+        ctx.fillStyle = "#ffe7a0";
+        ctx.beginPath(); ctx.arc(sx, sy - 42 * scale, 9 * scale, 0, Math.PI * 2); ctx.fill();
+        return;
+      }
+
+      if (a.kind === "player_start") {
+        ctx.save();
+        ctx.translate(sx, sy);
+        // pad
+        ctx.fillStyle = "rgba(244,196,48,0.15)";
+        ctx.beginPath(); ctx.arc(0, 0, 28 * scale, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#f4c430";
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath(); ctx.arc(0, 0, 28 * scale, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+        // flag
+        ctx.fillStyle = "#f4c430";
+        ctx.fillRect(-2 * scale, -36 * scale, 4 * scale, 36 * scale);
+        ctx.beginPath();
+        ctx.moveTo(2 * scale, -36 * scale);
+        ctx.lineTo(22 * scale, -28 * scale);
+        ctx.lineTo(2 * scale, -20 * scale);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+        ctx.font = `700 ${Math.max(11, 12 * scale)}px Syne`;
+        ctx.fillStyle = "#f4c430";
+        ctx.textAlign = "center";
+        ctx.fillText("SPAWN", sx, sy + 40 * scale);
+        return;
+      }
+
+      // NPC — game character sprite
+      const hostile = a.tags.includes("hostile");
+      const color = hostile ? "#ff3b4a" : "#3ddc97";
+      const accent = hostile ? "#ff8a3d" : "#7dffc5";
+      const r = 18 * scale;
+
+      // ground shadow + aggro aura
+      ctx.fillStyle = "rgba(0,0,0,0.45)";
+      ctx.beginPath(); ctx.ellipse(sx, sy + 12 * scale, r * 1.25, r * 0.5, 0, 0, Math.PI * 2); ctx.fill();
+      if (a.behavior === "attack") {
+        const pulse = (Math.sin(t * 12) + 1) * 0.5;
+        const ag = ctx.createRadialGradient(sx, sy, r, sx, sy, r * (3.2 + pulse));
+        ag.addColorStop(0, `rgba(255,59,74,${0.22 + pulse * 0.15})`);
+        ag.addColorStop(1, "rgba(255,59,74,0)");
+        ctx.fillStyle = ag;
+        ctx.beginPath(); ctx.arc(sx, sy, r * (3.2 + pulse), 0, Math.PI * 2); ctx.fill();
+      }
+
+      ctx.save();
+      ctx.translate(sx, sy + bob);
+      ctx.rotate(a.yaw || 0);
+
+      // legs (walk cycle)
+      const walk = Math.sin(t * (a.behavior === "attack" ? 14 : 8) + (a.patrolPhase || 0));
+      ctx.strokeStyle = "#1a222c";
+      ctx.lineWidth = 4 * scale;
+      ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(-4 * scale, 6 * scale); ctx.lineTo(-6 * scale + walk * 5 * scale, 16 * scale); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(4 * scale, 6 * scale); ctx.lineTo(6 * scale - walk * 5 * scale, 16 * scale); ctx.stroke();
+
+      // torso
+      const body = ctx.createLinearGradient(-r, 0, r, 0);
+      body.addColorStop(0, hostile ? "#a01828" : "#1f8a5a");
+      body.addColorStop(0.5, color);
+      body.addColorStop(1, accent);
+      ctx.fillStyle = body;
+      ctx.beginPath();
+      ctx.roundRect(-r * 0.7, -r * 0.55, r * 1.4, r * 1.15, 6 * scale);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.35)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // head
+      ctx.fillStyle = "#f0d2b0";
+      ctx.beginPath(); ctx.arc(0, -r * 0.95, r * 0.42, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = hostile ? "#2a1014" : "#163028";
+      ctx.beginPath(); ctx.arc(0, -r * 1.15, r * 0.45, Math.PI, 0); ctx.fill(); // hair/helmet
+
+      // weapon or shield
+      if (hostile) {
+        ctx.fillStyle = "#c0c8d0";
+        ctx.fillRect(r * 0.55, -r * 0.15, r * 1.1, r * 0.22);
+        ctx.fillStyle = "#ffb020";
+        ctx.beginPath();
+        ctx.moveTo(r * 1.65, -r * 0.05);
+        ctx.lineTo(r * 2.1, 0);
+        ctx.lineTo(r * 1.65, r * 0.05);
+        ctx.closePath();
+        ctx.fill();
+        // muzzle glow when attacking
+        if (a.behavior === "attack" && Math.sin(t * 20) > 0.3) {
+          ctx.fillStyle = "rgba(255,220,80,0.9)";
+          ctx.beginPath(); ctx.arc(r * 2.15, 0, 5 * scale, 0, Math.PI * 2); ctx.fill();
+        }
+      } else {
+        ctx.strokeStyle = accent;
+        ctx.lineWidth = 3 * scale;
+        ctx.beginPath(); ctx.arc(-r * 0.9, 0, r * 0.55, -0.8, 0.8); ctx.stroke();
+      }
+
+      // chevron direction
+      ctx.fillStyle = "rgba(255,255,255,0.85)";
+      ctx.beginPath();
+      ctx.moveTo(r * 0.95, 0);
+      ctx.lineTo(r * 0.35, r * 0.35);
+      ctx.lineTo(r * 0.35, -r * 0.35);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // hp bar
+      const hp = (a.hp ?? 100) / 100;
+      ctx.fillStyle = "rgba(0,0,0,0.65)";
+      ctx.fillRect(sx - 22 * scale, sy - 42 * scale, 44 * scale, 6 * scale);
+      ctx.fillStyle = hp > 0.4 ? color : "#ff3b4a";
+      ctx.fillRect(sx - 22 * scale, sy - 42 * scale, 44 * scale * hp, 6 * scale);
+      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      ctx.strokeRect(sx - 22 * scale, sy - 42 * scale, 44 * scale, 6 * scale);
+
+      // nameplate
+      ctx.font = `700 ${Math.max(11, 12 * scale)}px Syne`;
+      ctx.fillStyle = color;
+      ctx.textAlign = "center";
+      ctx.fillText(a.name, sx, sy - 50 * scale);
+      ctx.font = `500 ${Math.max(9, 10 * scale)}px "IBM Plex Mono"`;
+      ctx.fillStyle = "rgba(232,238,244,0.75)";
+      ctx.fillText(a.behavior.toUpperCase() + (hostile ? " · HOSTILE" : ""), sx, sy + 34 * scale);
+
+      if (world.focusId === a.id) {
+        ctx.beginPath();
+        ctx.arc(sx, sy, 34 * scale + Math.sin(t * 6) * 4, 0, Math.PI * 2);
+        ctx.strokeStyle = "#f4c430";
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([5, 5]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (flash > 0) {
+        ctx.beginPath();
+        ctx.arc(sx, sy, 40 * scale, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${flash * 0.3})`;
+        ctx.fill();
+      }
+    }
+
+    function drawWeather(w, h, dt) {
+      const { weather, time } = world;
+      if (weather === "rain" || weather === "overcast") {
+        for (const p of fogPuffs) {
+          p.x += dt * 0.01;
+          if (p.x > 1.2) p.x = -0.2;
+          const x = p.x * w;
+          const y = ((p.y + Math.sin(performance.now() / 3000 + p.ph) * 0.05) % 1) * h;
+          const g = ctx.createRadialGradient(x, y, 10, x, y, p.r);
+          g.addColorStop(0, `rgba(160,180,200,${p.a})`);
+          g.addColorStop(1, "rgba(160,180,200,0)");
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(x, y, p.r, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      if (weather === "rain") {
+        ctx.strokeStyle = "rgba(170,210,255,0.45)";
+        ctx.lineWidth = 1.2;
+        for (const d of rainDrops) {
+          d.y += d.sp * dt * 1.8;
+          d.x += dt * 0.08;
+          if (d.y > 1.1) { d.y = -0.05; d.x = Math.random(); }
+          if (d.x > 1.1) d.x = 0;
+          const x = d.x * w;
+          const y = d.y * h;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + 2, y + d.len);
+          ctx.stroke();
+        }
+      }
+      // sun / moon disc
+      const night = time >= 19 || time < 6;
+      const discX = w * (0.15 + (time / 24) * 0.7);
+      const discY = h * (0.18 + Math.sin((time / 24) * Math.PI) * 0.08);
+      const g = ctx.createRadialGradient(discX, discY, 2, discX, discY, night ? 40 : 55);
+      if (night) {
+        g.addColorStop(0, "rgba(220,230,255,0.9)");
+        g.addColorStop(1, "rgba(220,230,255,0)");
+      } else {
+        g.addColorStop(0, "rgba(255,220,120,0.95)");
+        g.addColorStop(1, "rgba(255,180,60,0)");
+      }
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(discX, discY, night ? 40 : 55, 0, Math.PI * 2); ctx.fill();
+    }
+
+    function drawScan(w, h, t) {
+      if (!runningAgent) return;
+      scanAngle += 0.02;
+      const { sx, sy } = worldToScreen(cam.x, cam.y);
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.rotate(scanAngle);
+      const grad = ctx.createConicGradient(0, 0, 0);
+      grad.addColorStop(0, "rgba(46,196,182,0.0)");
+      grad.addColorStop(0.15, "rgba(46,196,182,0.18)");
+      grad.addColorStop(0.16, "rgba(46,196,182,0)");
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(0, 0, Math.min(w, h) * 0.45, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+
+    function tickActors(dt) {
+      for (const a of world.actors) {
+        if (a.flash > 0) a.flash = Math.max(0, a.flash - dt * 1.8);
+        if (a.kind !== "npc" || runningAgent) continue;
+        if (a.behavior === "patrol") {
+          a.patrolPhase = (a.patrolPhase || 0) + dt * 0.7;
+          a.location.x += Math.cos(a.patrolPhase) * 28 * dt;
+          a.location.y += Math.sin(a.patrolPhase * 0.85) * 28 * dt;
+          a.yaw = a.patrolPhase + Math.PI / 2;
+        } else if (a.behavior === "attack") {
+          a.attackCd = (a.attackCd || 0) - dt;
+          const prey = world.actors.find((x) => x.kind === "player_start") ||
+            world.actors.find((x) => x.kind === "npc" && !x.tags.includes("hostile"));
+          if (prey) {
+            const dx = prey.location.x - a.location.x;
+            const dy = prey.location.y - a.location.y;
+            const d = Math.hypot(dx, dy) || 1;
+            a.yaw = Math.atan2(dy, dx);
+            a.location.x += (dx / d) * 55 * dt;
+            a.location.y += (dy / d) * 55 * dt;
+            if (a.attackCd <= 0 && d < 140) {
+              a.attackCd = 1.1;
+              addBeam(a.location.x, a.location.y, prey.location.x, prey.location.y, "#ff3b4a");
+              addParticles(prey.location.x, prey.location.y, "#ff3b4a", 10, 100);
+              prey.flash = 0.6;
+            }
+          }
+        }
+      }
+    }
+
+    function tickFx(dt) {
+      particles = particles.filter((p) => {
+        p.life -= dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vx *= 0.96; p.vy *= 0.96;
+        return p.life > 0;
+      });
+      ripples = ripples.filter((r) => {
+        r.life -= dt * 0.9;
+        r.r += dt * 80;
+        return r.life > 0;
+      });
+      floaters = floaters.filter((f) => {
+        f.life -= dt;
+        f.y -= 40 * dt;
+        return f.life > 0;
+      });
+      beams = beams.filter((b) => {
+        b.life -= dt;
+        return b.life > 0;
+      });
+      if (shake > 0) shake = Math.max(0, shake - dt * 28);
+      cam.x += (cam.tx - cam.x) * Math.min(1, dt * 3.2);
+      cam.y += (cam.ty - cam.y) * Math.min(1, dt * 3.2);
+    }
+
+    function renderFrame(ts) {
+      const dt = Math.min(0.05, (ts - lastTs) / 1000);
+      lastTs = ts;
+      const w = canvas.clientWidth || 1200;
+      const h = canvas.clientHeight || 680;
+      tickActors(dt);
+      tickFx(dt);
+
+      const sky = skyColors(world.time, world.weather);
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, sky.top);
+      g.addColorStop(0.45, sky.mid);
+      g.addColorStop(1, sky.bot);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.save();
+      if (shake > 0) {
+        ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+      }
+
+      const scale = Math.min(w, h) / WORLD * cam.zoom;
+      drawGrid(w, h, scale);
+      drawGroundDecals(scale);
+
+      // beams under actors
+      for (const b of beams) {
+        const a = worldToScreen(b.x1, b.y1);
+        const c = worldToScreen(b.x2, b.y2);
+        ctx.globalAlpha = Math.max(0, b.life);
+        ctx.strokeStyle = b.color;
+        ctx.lineWidth = 3;
+        ctx.shadowColor = b.color;
+        ctx.shadowBlur = 12;
+        ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(c.sx, c.sy); ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+      }
+
+      for (const r of ripples) {
+        const s = worldToScreen(r.x, r.y);
+        ctx.beginPath();
+        ctx.arc(s.sx, s.sy, r.r * scale, 0, Math.PI * 2);
+        ctx.strokeStyle = r.color;
+        ctx.globalAlpha = r.life * 0.7;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+
+      // sort actors by y for depth
+      const sorted = [...world.actors].sort((a, b) => a.location.y - b.location.y);
+      const t = ts / 1000;
+      for (const a of sorted) drawActor(a, t);
+
+      for (const p of particles) {
+        const s = worldToScreen(p.x, p.y);
+        ctx.globalAlpha = Math.max(0, p.life / p.max);
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(s.sx, s.sy, p.size, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      for (const f of floaters) {
+        const s = worldToScreen(f.x, f.y);
+        ctx.globalAlpha = Math.max(0, f.life);
+        ctx.font = `700 ${14 * scale}px Syne, sans-serif`;
+        ctx.fillStyle = f.color;
+        ctx.textAlign = "center";
+        ctx.fillText(f.text, s.sx, s.sy);
+        ctx.globalAlpha = 1;
+      }
+
+      drawScan(w, h, t);
+      ctx.restore();
+
+      // weather overlay (screen space)
+      drawWeather(w, h, dt);
+      ctx.fillStyle = sky.tint;
+      ctx.fillRect(0, 0, w, h);
+
+      // vignette
+      const vig = ctx.createRadialGradient(w / 2, h / 2, h * 0.2, w / 2, h / 2, h * 0.75);
+      vig.addColorStop(0, "rgba(0,0,0,0)");
+      vig.addColorStop(1, "rgba(0,0,0,0.45)");
+      ctx.fillStyle = vig;
+      ctx.fillRect(0, 0, w, h);
+
+      // film grain
+      if ((ts | 0) % 2 === 0) {
+        ctx.globalAlpha = 0.035;
+        for (let i = 0; i < 60; i++) {
+          ctx.fillStyle = Math.random() > 0.5 ? "#fff" : "#000";
+          ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      requestAnimationFrame(renderFrame);
+    }
+
+    function updateHud() {
+      $("hud-map").innerHTML = `<strong>MAP</strong> ${world.map.split("/").pop()}`;
+      $("hud-clock").innerHTML = `<strong>TOD</strong> ${world.time.toFixed(1)}h`;
+      $("hud-wx").innerHTML = `<strong>WX</strong> ${world.weather}`;
       $("m-backend").textContent = "sim";
       $("m-actors").textContent = String(world.actors.length);
-      $("m-npcs").textContent = String(npcs.length);
+      $("m-npcs").textContent = String(world.actors.filter((a) => a.kind === "npc").length);
       $("m-weather").textContent = world.weather;
-      $("actors").innerHTML = world.actors.map((a) => `
-        <div class="actor ${a.kind}">
-          <span>${a.id} · ${a.kind}${a.tags.includes("hostile") ? " · hostile" : ""}</span>
-          <span class="meta">${a.behavior || "—"} @ ${a.location.x.toFixed(0)},${a.location.y.toFixed(0)}</span>
-        </div>`).join("");
     }
 
     function pushTrace(kind, html) {
@@ -274,78 +1132,174 @@
       $("trace").prepend(el);
     }
 
-    function runPlaybook(goal) {
+    function setBusy(b) {
+      runningAgent = b;
+      $("run").disabled = b;
+      $("diagnose").disabled = b;
+      $("refresh").disabled = b;
+      $("hud-alert").textContent = b ? "agent executing…" : "agent idle";
+      $("hud-alert").className = b ? "chip warn" : "chip";
+    }
+
+    function renderScen() {
+      $("scen").innerHTML = Object.entries(SCENARIOS).map(([id, s]) => `
+        <button class="sc ${id === scenario ? "on" : ""}" data-id="${id}" type="button">
+          <strong>${s.title}</strong>
+          <span class="meta">${s.blurb}</span>
+        </button>`).join("");
+      $("scen").querySelectorAll(".sc").forEach((el) => {
+        el.onclick = () => {
+          if (runningAgent) return;
+          scenario = el.dataset.id;
+          world = buildWorld(scenario);
+          cam.tx = 0; cam.ty = 0;
+          particles = []; ripples = []; floaters = []; beams = [];
+          updateHud();
+          renderScen();
+          $("status").textContent = `Loaded ${world.map} — viewport refreshed`;
+          $("trace").innerHTML = "";
+          toast(SCENARIOS[scenario].title);
+        };
+      });
+    }
+
+    async function runPlaybook(goal) {
+      if (runningAgent) return;
+      setBusy(true);
       $("trace").innerHTML = "";
       const g = goal.toLowerCase();
       pushTrace("tool_call", `<div class="meta">tool_call</div><strong>diagnose_level</strong>`);
       const findings = diagnose(world);
       pushTrace("tool_result", `<div class="meta">findings</div>${findings.join(" · ")}`);
+      pushTrace("fx", `<div class="meta">viewport</div>scan sweep · highlighting overlaps`);
+      toast("diagnose_level");
+      shake = 4;
+      await sleep(700);
 
       pushTrace("tool_call", `<div class="meta">tool_call</div><strong>list_actors</strong> kind=npc`);
       const npcs = world.actors.filter((a) => a.kind === "npc");
+      for (const n of npcs) {
+        focusActor(n.id);
+        addRipple(n.location.x, n.location.y, n.tags.includes("hostile") ? "#ff3b4a" : "#3ddc97");
+        await sleep(180);
+      }
+      await sleep(200);
 
       if (g.includes("rain") || g.includes("weather")) {
         world.weather = g.includes("rain") ? "rain" : "clear";
         pushTrace("tool_call", `<div class="meta">tool_call</div><strong>set_weather</strong> ${world.weather}`);
+        await animateWeather(world.weather);
+        updateHud();
       }
       if (g.includes("night")) {
         world.time = 22;
         pushTrace("tool_call", `<div class="meta">tool_call</div><strong>set_time_of_day</strong> 22`);
+        toast("set_time_of_day 22");
+        await sleep(450);
+        updateHud();
       }
 
       if (g.includes("attack") || g.includes("hostile") || g.includes("combat") || scenario === "combat-arena") {
-        npcs.forEach((n) => {
+        for (const n of npcs) {
           if (n.tags.includes("hostile")) {
-            n.behavior = "attack";
             pushTrace("tool_call", `<div class="meta">tool_call</div><strong>set_npc_behavior</strong> ${n.id} → attack`);
+            await animateAttack(n);
           } else {
             n.behavior = "patrol";
           }
-        });
+        }
       }
 
       if (g.includes("spread") || g.includes("patrol") || findings.some((f) => f.includes("overlap"))) {
-        npcs.slice(0, 3).forEach((n, i) => {
-          n.location = { x: 200 * (i + 1), y: -150 * (i + 1), z: 92 };
-          n.behavior = "patrol";
+        const targets = [
+          { x: 280, y: -220 },
+          { x: -320, y: 260 },
+          { x: 360, y: 300 },
+        ];
+        for (let i = 0; i < Math.min(3, npcs.length); i++) {
+          const n = npcs[i];
+          // keep attack on hostiles after spread unless goal is pure patrol
+          const keepAttack = n.tags.includes("hostile") && (g.includes("attack") || g.includes("hostile"));
           pushTrace("tool_call", `<div class="meta">tool_call</div><strong>move_actor</strong> ${n.id}`);
-        });
+          await animateMove(n, targets[i].x, targets[i].y, 800);
+          n.behavior = keepAttack ? "attack" : "patrol";
+        }
       }
 
       if (g.includes("spawn") || g.includes("crate")) {
-        world.actors.push({
+        const actor = {
           id: `A_${String(world.actors.length + 1).padStart(3, "0")}`,
           name: "AgentCrate", kind: "prop",
-          location: { x: 300, y: 100, z: 0 }, tags: ["prop", "agent"], behavior: "idle",
-        });
+          location: { x: 220, y: 140, z: 0 }, tags: ["prop", "agent"], behavior: "idle",
+          yaw: 0.4, hp: 100, flash: 0,
+        };
+        world.actors.push(actor);
         pushTrace("tool_call", `<div class="meta">tool_call</div><strong>spawn_actor</strong> AgentCrate`);
+        await animateSpawn(actor);
       }
 
-      const after = diagnose(world);
       pushTrace("tool_call", `<div class="meta">tool_call</div><strong>inspect_level</strong>`);
-      pushTrace(
-        "assistant",
-        `Playbook finished on ${world.map}. Actors=${world.actors.length} weather=${world.weather}. ${after[0]}`
-      );
-      $("status").textContent = `Agent done · ${world.map} · ${world.actors.length} actors`;
-      renderWorld();
+      toast("inspect_level");
+      cam.tx = 0; cam.ty = 0;
+      await sleep(500);
+      const after = diagnose(world);
+      pushTrace("assistant", `Playbook finished on ${world.map}. Actors=${world.actors.length} weather=${world.weather}. ${after[0]}`);
+      $("status").textContent = `Agent done · ${world.map} · ${world.actors.length} actors · watch hostiles / patrols keep moving`;
+      updateHud();
+      setBusy(false);
+      toast("agent complete");
     }
 
     $("run").onclick = () => runPlaybook($("goal").value);
-    $("diagnose").onclick = () => {
+    $("diagnose").onclick = async () => {
+      if (runningAgent) return;
+      setBusy(true);
       $("trace").innerHTML = "";
       pushTrace("tool_call", `<div class="meta">tool_call</div><strong>diagnose_level</strong>`);
-      pushTrace("tool_result", diagnose(world).map((f) => `• ${f}`).join("<br>"));
-      $("status").textContent = "Diagnose complete";
+      const findings = diagnose(world);
+      pushTrace("tool_result", findings.map((f) => `• ${f}`).join("<br>"));
+      toast("diagnose_level");
+      for (const n of world.actors.filter((a) => a.kind === "npc")) {
+        addRipple(n.location.x, n.location.y, "#f4c430");
+        focusActor(n.id);
+        await sleep(160);
+      }
+      $("status").textContent = "Diagnose complete — check viewport ripples";
+      setBusy(false);
     };
     $("refresh").onclick = () => {
+      if (runningAgent) return;
       world = buildWorld(scenario);
-      renderWorld();
-      $("status").textContent = "Snapshot refreshed from sim seed";
+      particles = []; ripples = []; floaters = []; beams = [];
+      cam.tx = 0; cam.ty = 0;
+      updateHud();
+      $("trace").innerHTML = "";
+      $("status").textContent = "Level reset from seed";
+      toast("level reset");
     };
 
+    // click to focus actor
+    canvas.addEventListener("click", (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = ev.clientX - rect.left;
+      const my = ev.clientY - rect.top;
+      let best = null, bestD = 28;
+      for (const a of world.actors) {
+        const s = worldToScreen(a.location.x, a.location.y);
+        const d = Math.hypot(s.sx - mx, s.sy - my);
+        if (d < bestD) { bestD = d; best = a; }
+      }
+      if (best) {
+        focusActor(best.id);
+        addRipple(best.location.x, best.location.y, "#f4c430");
+        toast(best.name);
+      }
+    });
+
     renderScen();
-    renderWorld();
+    updateHud();
+    resizeCanvas();
+    requestAnimationFrame(renderFrame);
   </script>
 </body>
 </html>
